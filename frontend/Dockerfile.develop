@@ -8,5 +8,5 @@ COPY package.json .
 COPY package-lock.json .
 RUN npm install --silent
 
-WORKDIR /sam-explorer
-ENV PATH /sam-explorer/node_modules/.bin:$PATH
+WORKDIR /repo/
+ENV PATH /repo/node_modules/.bin:$PATH
