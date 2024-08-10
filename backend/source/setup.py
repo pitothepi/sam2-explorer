@@ -30,6 +30,8 @@ REQUIRED_PACKAGES = [
     "hydra-core>=1.3.2",
     "iopath>=0.1.10",
     "pillow>=9.4.0",
+    "flask>=3.0.3",
+    "flask_cors>=4.0.1"
 ]
 
 EXTRA_PACKAGES = {
