@@ -22,8 +22,7 @@ FROM sam-base AS backend-server
 WORKDIR /cachedRepos/
 RUN git clone https://github.com/pitothepi/sam2-explorer.git
 WORKDIR /cachedRepos/sam2-explorer/backend/source/
-RUN python3 -m pip install -e .
-COPY --from=sam-base /cachedRepos/segment-anything-2/checkpoints ./checkpoints
+RUN python3 -m pip install -r requirements.txt
 
 WORKDIR /
 
