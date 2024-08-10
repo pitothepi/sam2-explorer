@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      context: ./frontend/sam-explorer
+      dockerfile: ../Dockerfile.develop
+    restart: no
+    volumes:
+      - "./frontend/sam-explorer:/sam-explorer"
+    ports:
+      - 3000:3000
+    # command: >
+    #   bash -c "cp -rfu /cache/node_modules/. /app/node_modules/  
+    #   && npm start"
+    command: >
+      bash -c "npm start"
