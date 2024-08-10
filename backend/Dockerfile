@@ -18,12 +18,6 @@ RUN python3 -m pip install -e ".[demo]"
 
 
 FROM sam-base AS backend-server
-# clone my repo
-WORKDIR /cachedRepos/
-RUN git clone https://github.com/pitothepi/sam2-explorer.git
-WORKDIR /cachedRepos/sam2-explorer/backend/source/
-RUN python3 -m pip install -r requirements.txt
-
 WORKDIR /
 
 # nice to have 
@@ -38,10 +32,17 @@ COPY install_vscode_server.bash .
 
 # run once for each version of vs code we want to support
 RUN bash install_vscode_server.bash b1c0a14de1414fcdaa400695b4db1c0799bc3124
-RUN bash install_vscode_server.bash ea1445cc7016315d0f5728f8e8b12a45dc0a7286
 
 RUN rm install_vscode_server.bash
 
-WORKDIR /repo/
+# break caching of the git clone
+# run build with `--build-arg CACHEBUST=$(date +%s)` to force recloning of repo
+ARG CACHEBUST=1
+# clone my repo
+WORKDIR /cachedRepos/
+RUN git clone https://github.com/pitothepi/sam2-explorer.git
+WORKDIR /cachedRepos/sam2-explorer/backend/source/
+RUN python3 -m pip install -r requirements.txt
 
+WORKDIR /repo/
 # ENTRYPOINT [ "jupyter", "lab", "--allow-root", "--ip=0.0.0.0" ]
