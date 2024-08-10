@@ -1,0 +1,108 @@
+/* * {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  background-color: #282c34;
+
+}
+
+.Container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0 10px;
+}
+
+img {
+  height: 400px;
+  width: 400px;
+  object-fit: cover;
+}
+
+button {
+  background-color: crimson;
+  color: #fff;
+  margin-top: 10px;
+  padding: 10px 40px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+} */
+
+.centeredBox {
+  margin: auto; /* Horizontally center the div */
+  position: absolute; /* Position the div absolutely */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.frame {
+  border: 3px double black;
+  padding: 5px;
+  background-color: #faf9f6;
+}
+
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+.flexRow {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  gap: 5px;
+}
+
+
+div.rainbowBox {
+  width: 100vw;
+  height: 100vh;
+  background-color: #282b2d;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+/* div.rainbowBox {
+  width: 100vw;
+  height: 100vh;
+  background-image: repeating-linear-gradient(45deg, violet, indigo, blue, green, yellow, orange, red, violet);
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-size: 800% 800%;
+  animation: rainbow 8s ease infinite;
+}
+
+@keyframes rainbow {
+  0% {
+      background-position: 0% 50%
+  }
+
+  50% {
+      background-position: 100% 25%
+  }
+
+  100% {
+      background-position: 0% 50%
+  }
+} */
