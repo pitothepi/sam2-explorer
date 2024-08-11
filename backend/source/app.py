@@ -13,12 +13,10 @@ CORS(app)
 @app.route('/segment-single-image', methods=['POST'])
 def process_image():
     print("got image!", flush=True)
-    # print(f"form: {request.form}", flush=True)
+
     for field in ['image', 'positive-points', 'negative-points']:
         if field not in request.form:
             return f"field {field} not in request", 400
-
-    print(f"positive points: {request.form['positive-points']}", flush=True)
 
     imageDataURL = request.form['image']
     
@@ -46,7 +44,7 @@ def process_image():
     img_io = io.BytesIO()
     segmented_images[0].save(img_io, image_format)
     img_io.seek(0)
-
+    
     return jsonify({'image': f"{image_header},{base64.b64encode(img_io.getvalue()).decode('utf-8')}"})
 
 if __name__ == '__main__':

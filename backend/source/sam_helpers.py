@@ -48,8 +48,17 @@ def show_box(box, ax):
 def draw_masks(image, masks, scores, image_format, point_coords=None, box_coords=None, input_labels=None, borders=True):
     figs = []
 
+    # Get the dimensions of the input image
+    height, width = image.shape[:2]
+    # configurable to make stuff look good
+    dpi = 96
+
     for i, (mask, score) in enumerate(zip(masks, scores)):
-        fig, ax = plt.subplots(figsize=(10, 10))
+        fig, ax = plt.subplots(figsize=(width/dpi, height/dpi), dpi=dpi)
+
+        # want axis to fill entire figure
+        ax.set_position([0,0,1,1])
+
         ax.imshow(image)
         show_mask(mask, ax, borders=borders)
 
