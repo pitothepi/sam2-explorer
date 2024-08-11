@@ -3,6 +3,9 @@ from flask_cors import CORS
 from PIL import Image
 import io
 import base64
+import json
+
+import sam_helpers
 
 app = Flask(__name__)
 CORS(app)
@@ -10,12 +13,11 @@ CORS(app)
 @app.route('/segment-single-image', methods=['POST'])
 def process_image():
     print("got image!", flush=True)
-    print(f"form: {request.form}", flush=True)
+    # print(f"form: {request.form}", flush=True)
     for field in ['image', 'positive-points', 'negative-points']:
         if field not in request.form:
             return f"field {field} not in request", 400
 
-    # form = request.form
     print(f"positive points: {request.form['positive-points']}", flush=True)
 
     imageDataURL = request.form['image']
@@ -33,12 +35,16 @@ def process_image():
     # Use PIL to open the image from the bytes data
     image = Image.open(io.BytesIO(image_bytes))
 
-    # Process the image (example: convert to grayscale)
-    processed_img = image.convert('L')
+    # get the points
+    positive_points = json.loads(request.form['positive-points'])
+    negative_points = json.loads(request.form['negative-points'])
 
-    # Save the processed image to a bytes buffer
+    # segment the image
+    segmented_images = sam_helpers.segment_single_image(image, positive_points, negative_points, image_format = image_format)
+
+    # Save the segmented image to a bytes buffer
     img_io = io.BytesIO()
-    processed_img.save(img_io, image_format)
+    segmented_images[0].save(img_io, image_format)
     img_io.seek(0)
 
     return jsonify({'image': f"{image_header},{base64.b64encode(img_io.getvalue()).decode('utf-8')}"})

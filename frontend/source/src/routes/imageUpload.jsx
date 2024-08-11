@@ -10,6 +10,7 @@ export default function ImageUpload() {
     const [positivePointMode, setPositivePointMode] = useState(true);
 
     const canvasRef = useRef(null);
+    const imageRef = useRef(null);
 
     // gets image from user's computer
     const handleImageUpload = (e) => {
@@ -61,12 +62,21 @@ export default function ImageUpload() {
         }
     }, [positivePoints, negativePoints]);
 
+    // helper function to make the point locations relative to the actual size of the image
+    // (since the display size of the image is different from the file size, the points clicked
+    // on the canvas aren't necessairly correct)
+    const remapPixelCoordinates = (points) => {
+        const xMultiplier = imageRef.current.naturalWidth / imageRef.current.width;
+        const yMultiplier = imageRef.current.naturalHeight / imageRef.current.height;
+        return points.map( point => [ point[0] * xMultiplier, point[1] * yMultiplier ] );
+    }
+
     // sends the image and points to the backend for segmentation and displays the result
     const handleSegment = () => {
         const formData = new FormData();
         formData.append('image', uploadedImage);
-        formData.append('positive-points', JSON.stringify(positivePoints));
-        formData.append('negative-points', JSON.stringify(negativePoints));
+        formData.append('positive-points', JSON.stringify(remapPixelCoordinates(positivePoints)));
+        formData.append('negative-points', JSON.stringify(remapPixelCoordinates(negativePoints)));
 
         axios.post('http://192.168.0.102:5000/segment-single-image', formData, {
             headers: {
@@ -94,7 +104,7 @@ export default function ImageUpload() {
                     </div>
                     <div class="flexColumn" style={uploadedImage ? {} : { display: "none" }}>
                         <div className="stacker">
-                            <img src={uploadedImage} alt="Uploaded" />
+                            <img src={uploadedImage} ref={imageRef} alt="Uploaded" />
                             <canvas ref={canvasRef} onClick={handleCanvasClick}></canvas>
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
