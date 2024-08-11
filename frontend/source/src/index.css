@@ -53,9 +53,26 @@ button {
 }
 
 .frame {
-  border: 3px double black;
   padding: 5px;
   background-color: #faf9f6;
+
+	--angle: 0deg;
+	border: 2px solid;
+	border-image: conic-gradient(from var(--angle), red, yellow, lime, aqua, blue, magenta, red) 1;
+	
+	animation: 2s rotate linear infinite;
+}
+
+@keyframes rotate {
+	to {
+		--angle: 360deg;
+	}
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
 }
 
 .flexColumn {
@@ -73,7 +90,7 @@ button {
 }
 
 
-div.rainbowBox {
+div.masterBackground {
   width: 100vw;
   height: 100vh;
   background-color: #282b2d;

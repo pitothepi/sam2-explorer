@@ -20,7 +20,7 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <div className="rainbowBox">
+    <div className="masterBackground">
     <RouterProvider router={router} />
     </div>
   </React.StrictMode>
