@@ -9,6 +9,7 @@ export default function ImageUpload() {
     const [positivePoints, setPositivePoints] = useState([]);
     const [negativePoints, setNegativePoints] = useState([]);
     const [positivePointMode, setPositivePointMode] = useState(true);
+    const [processing, setProcessing] = useState(false);
 
     const canvasRef = useRef(null);
     const imageRef = useRef(null);
@@ -58,14 +59,14 @@ export default function ImageUpload() {
         ctx.fillStyle = 'green';
         for (const point of positivePoints) {
             ctx.beginPath();
-            ctx.arc(point[0], point[1], 5, 0, 2 * Math.PI);
+            ctx.arc(point[0], point[1], 2.5, 0, 2 * Math.PI);
             ctx.fill();
         }
 
         ctx.fillStyle = 'red';
         for (const point of negativePoints) {
             ctx.beginPath();
-            ctx.arc(point[0], point[1], 5, 0, 2 * Math.PI);
+            ctx.arc(point[0], point[1], 2.5, 0, 2 * Math.PI);
             ctx.fill();
         }
     }, [positivePoints, negativePoints]);
@@ -81,6 +82,7 @@ export default function ImageUpload() {
 
     // sends the image and points to the backend for segmentation and displays the result
     const handleSegment = () => {
+        setProcessing(true);
         const formData = new FormData();
         formData.append('image', uploadedImage);
         formData.append('positive-points', JSON.stringify(remapPixelCoordinates(positivePoints)));
@@ -97,6 +99,9 @@ export default function ImageUpload() {
             })
             .catch((error) => {
                 console.error('Error uploading file:', error);
+            })
+            .finally(() => {
+                setProcessing(false);
             });
     };
 
@@ -104,12 +109,14 @@ export default function ImageUpload() {
         <div className="centeredBox"
             style={uploadedImage ?
                 { width: "fit-content", height: "fit-content" } :
-                { width: "fit-content", height: "fit-content", minWidth: "640px" }}>
-            <div className="frame">
+                { width: "fit-content", height: "fit-content", minWidth: "min(640px, 70vw)" }}>
+            <div className={processing ? "fastFrame" : "frame"}>
                 <div className="flexColumn">
                     <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
                         <input type="file" onChange={handleImageUpload} />
-                        <button onClick={handleReset} style={resultImage ? {} : { display: "none" }}>Reset</button>
+                        <button 
+                        onClick={handleReset} 
+                        style={resultImage || positivePoints.length > 0 || negativePoints.length > 0 ? {} : { display: "none" }}>Reset</button>
                     </div>
                     <div class="flexColumn" style={uploadedImage ? {} : { display: "none" }}>
                         <div className="stacker">
