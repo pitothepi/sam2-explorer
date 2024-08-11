@@ -24,6 +24,7 @@ services:
       - "./backend/source:/repo"
     ports:
       - 8888:8888
+      - 5000:5000
     deploy:
       resources:
         reservations:
@@ -31,4 +32,4 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    command: jupyter lab --allow-root --ip=0.0.0.0
+    command: flask run --host 0.0.0.0 #jupyter lab --allow-root --ip=0.0.0.0
