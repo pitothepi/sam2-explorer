@@ -40,6 +40,13 @@ export default function ImageUpload() {
         }
     };
 
+    // clear the result and points
+    const handleReset = () => {
+        setResultImage(null);
+        setPositivePoints([]);
+        setNegativePoints([]);
+    };
+
     // redraws canvas whenever points change
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -100,8 +107,9 @@ export default function ImageUpload() {
                 { width: "fit-content", height: "fit-content", minWidth: "640px" }}>
             <div className="frame">
                 <div className="flexColumn">
-                    <div style={{ width: "100%" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
                         <input type="file" onChange={handleImageUpload} />
+                        <button onClick={handleReset} style={resultImage ? {} : { display: "none" }}>Reset</button>
                     </div>
                     <div class="flexColumn" style={uploadedImage ? {} : { display: "none" }}>
                         <div className="stacker">
