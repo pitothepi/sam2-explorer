@@ -11,6 +11,7 @@ export default function ImageUpload() {
 
     const canvasRef = useRef(null);
 
+    // gets image from user's computer
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -22,6 +23,7 @@ export default function ImageUpload() {
         }
     };
 
+    // handles user setting a point on the canvas
     const handleCanvasClick = (e) => {
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
@@ -36,6 +38,7 @@ export default function ImageUpload() {
         }
     };
 
+    // redraws canvas whenever points change
     useEffect(() => {
         const canvas = canvasRef.current;
         canvas.width = canvas.getBoundingClientRect().width;
@@ -58,26 +61,21 @@ export default function ImageUpload() {
         }
     }, [positivePoints, negativePoints]);
 
+    // sends the image and points to the backend for segmentation and displays the result
     const handleSegment = () => {
         const formData = new FormData();
         formData.append('image', uploadedImage);
+        formData.append('positive-points', JSON.stringify(positivePoints));
+        formData.append('negative-points', JSON.stringify(negativePoints));
 
         axios.post('http://192.168.0.102:5000/segment-single-image', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
-            },
-            responseType: 'arraybuffer'
+            }
         })
             .then((response) => {
-                console.log('File uploaded successfully:', response.data);
-                // convert base64 image representation to proper data url
-                const base64 = btoa(
-                    new Uint8Array(response.data).reduce(
-                        (data, byte) => data + String.fromCharCode(byte),
-                        '',
-                    ),
-                );
-                setUploadedImage(`data:image/jpeg;base64,${base64}`);
+                console.log('File uploaded successfully.');
+                setUploadedImage(response.data['image']);
             })
             .catch((error) => {
                 console.error('Error uploading file:', error);

@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from PIL import Image
 import io
@@ -9,15 +9,23 @@ CORS(app)
 
 @app.route('/segment-single-image', methods=['POST'])
 def process_image():
-    print("got image!")
+    print("got image!", flush=True)
+    print(f"form: {request.form}", flush=True)
+    for field in ['image', 'positive-points', 'negative-points']:
+        if field not in request.form:
+            return f"field {field} not in request", 400
 
-    if 'image' not in request.form:
-        return 'No image file found', 400
+    # form = request.form
+    print(f"positive points: {request.form['positive-points']}", flush=True)
 
     imageDataURL = request.form['image']
     
-    # Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
+    # split up the data url (which looks like "data:image/jpeg;base64,XXXXX")
+    image_header = imageDataURL.split(',')[0]
     image_data = imageDataURL.split(',')[1]
+    image_format = image_header.split('/')[-1].split(';')[0]
+    print(f"image header: {image_header}", flush=True)
+    print(f"image format: {image_format}", flush=True)
     
     # Decode the base64 string
     image_bytes = base64.b64decode(image_data)
@@ -30,10 +38,10 @@ def process_image():
 
     # Save the processed image to a bytes buffer
     img_io = io.BytesIO()
-    processed_img.save(img_io, 'JPEG')
+    processed_img.save(img_io, image_format)
     img_io.seek(0)
 
-    return send_file(img_io, mimetype='image/jpeg')
+    return jsonify({'image': f"{image_header},{base64.b64encode(img_io.getvalue()).decode('utf-8')}"})
 
 if __name__ == '__main__':
     app.run(debug=True)
