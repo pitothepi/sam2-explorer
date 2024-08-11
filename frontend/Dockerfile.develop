@@ -4,9 +4,19 @@ FROM node:current
 WORKDIR /cache
 
 # install app dependencies
-COPY package.json .
-COPY package-lock.json .
+COPY source/package.json .
+COPY source/package-lock.json .
 RUN npm install --silent
+
+WORKDIR / 
+# get vs code server
+RUN apt-get install -y curl
+COPY install_vscode_server.bash .
+
+# run once for each version of vs code we want to support
+RUN bash install_vscode_server.bash b1c0a14de1414fcdaa400695b4db1c0799bc3124
+
+RUN rm install_vscode_server.bash
 
 WORKDIR /repo/
 ENV PATH /repo/node_modules/.bin:$PATH

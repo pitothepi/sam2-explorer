@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y git wget
 # undeclared dependency of sam 2
 RUN python3 -m pip install wheel 
 
-# clone sam
+# build sam2
 WORKDIR /cachedRepos/
 RUN git clone https://github.com/facebookresearch/segment-anything-2.git
 WORKDIR /cachedRepos/segment-anything-2/checkpoints
@@ -35,13 +35,9 @@ RUN bash install_vscode_server.bash b1c0a14de1414fcdaa400695b4db1c0799bc3124
 
 RUN rm install_vscode_server.bash
 
-# break caching of the git clone
-# run build with `--build-arg CACHEBUST=$(date +%s)` to force recloning of repo
-ARG CACHEBUST=1
-# clone my repo
-WORKDIR /cachedRepos/
-RUN git clone https://github.com/pitothepi/sam2-explorer.git
-WORKDIR /cachedRepos/sam2-explorer/backend/source/
+# install backend requirements
+WORKDIR /cachedRepos/sam2-explorer_backend
+COPY source/requirements.txt .
 RUN python3 -m pip install -r requirements.txt
 
 WORKDIR /repo/

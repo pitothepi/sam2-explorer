@@ -1,8 +1,8 @@
 services:
   frontend:
     build:
-      context: ./frontend/source
-      dockerfile: ../Dockerfile.develop
+      context: ./frontend/
+      dockerfile: Dockerfile.develop
     restart: no
     volumes:
       - "./frontend/source:/repo"
