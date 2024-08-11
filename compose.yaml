@@ -32,4 +32,4 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    command: flask run --host 0.0.0.0 #jupyter lab --allow-root --ip=0.0.0.0
+    command: flask run --debug --host 0.0.0.0 #jupyter lab --allow-root --ip=0.0.0.0

@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Switch from "react-switch";
+import axios from "axios";
 import "./imageUpload.css"
 
 export default function ImageUpload() {
-    const [uploadedImage, setUploadedImage] = useState(null); // New state for image URL
+    const [uploadedImage, setUploadedImage] = useState(null);
     const [positivePoints, setPositivePoints] = useState([]);
     const [negativePoints, setNegativePoints] = useState([]);
     const [positivePointMode, setPositivePointMode] = useState(true);
+
     const canvasRef = useRef(null);
 
     const handleImageUpload = (e) => {
@@ -43,7 +45,6 @@ export default function ImageUpload() {
 
         ctx.fillStyle = 'green';
         for (const point of positivePoints) {
-            // Draw a green circle at the clicked position
             ctx.beginPath();
             ctx.arc(point[0], point[1], 10, 0, 2 * Math.PI);
             ctx.fill();
@@ -51,27 +52,37 @@ export default function ImageUpload() {
 
         ctx.fillStyle = 'red';
         for (const point of negativePoints) {
-            // Draw a green circle at the clicked position
             ctx.beginPath();
             ctx.arc(point[0], point[1], 10, 0, 2 * Math.PI);
             ctx.fill();
         }
     }, [positivePoints, negativePoints]);
 
-    //   const handleUpload = () => {
-    //     const formData = new FormData();
-    //     formData.append('file', selectedFile);
+    const handleSegment = () => {
+        const formData = new FormData();
+        formData.append('image', uploadedImage);
 
-    //     // Replace with your API endpoint for file upload
-    //     axios.post('/upload', formData)
-    //       .then((response) => {
-    //         console.log('File uploaded successfully:', response.data);
-    //         setImageUrl(response.data.url); // Set the image URL
-    //       })
-    //       .catch((error) => {
-    //         console.error('Error uploading file:', error);
-    //       });
-    //   };
+        axios.post('http://192.168.0.102:5000/segment-single-image', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+            responseType: 'arraybuffer'
+        })
+            .then((response) => {
+                console.log('File uploaded successfully:', response.data);
+                // convert base64 image representation to proper data url
+                const base64 = btoa(
+                    new Uint8Array(response.data).reduce(
+                        (data, byte) => data + String.fromCharCode(byte),
+                        '',
+                    ),
+                );
+                setUploadedImage(`data:image/jpeg;base64,${base64}`);
+            })
+            .catch((error) => {
+                console.error('Error uploading file:', error);
+            });
+    };
 
     return (
         <div className="centeredBox"
@@ -101,7 +112,7 @@ export default function ImageUpload() {
                                 ></Switch>
                                 <p>positive point</p>
                             </div>
-                            <button>Segment</button>
+                            <button onClick={handleSegment}>Segment</button>
                         </div>
                     </div>
                 </div>
