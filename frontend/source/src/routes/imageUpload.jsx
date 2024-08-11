@@ -5,6 +5,7 @@ import "./imageUpload.css"
 
 export default function ImageUpload() {
     const [uploadedImage, setUploadedImage] = useState(null);
+    const [resultImage, setResultImage] = useState(null);
     const [positivePoints, setPositivePoints] = useState([]);
     const [negativePoints, setNegativePoints] = useState([]);
     const [positivePointMode, setPositivePointMode] = useState(true);
@@ -85,7 +86,7 @@ export default function ImageUpload() {
         })
             .then((response) => {
                 console.log('File uploaded successfully.');
-                setUploadedImage(response.data['image']);
+                setResultImage(response.data['image']);
             })
             .catch((error) => {
                 console.error('Error uploading file:', error);
@@ -104,7 +105,7 @@ export default function ImageUpload() {
                     </div>
                     <div class="flexColumn" style={uploadedImage ? {} : { display: "none" }}>
                         <div className="stacker">
-                            <img src={uploadedImage} ref={imageRef} alt="Uploaded" />
+                            <img src={resultImage ? resultImage : uploadedImage} ref={imageRef} alt="Uploaded" />
                             <canvas ref={canvasRef} onClick={handleCanvasClick}></canvas>
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
