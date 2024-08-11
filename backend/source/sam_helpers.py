@@ -62,9 +62,9 @@ def draw_masks(image, masks, scores, image_format, point_coords=None, box_coords
         ax.imshow(image)
         show_mask(mask, ax, borders=borders)
 
-        if point_coords is not None:
-            assert input_labels is not None
-            show_points(point_coords, input_labels, plt.gca())
+        # if point_coords is not None:
+        #     assert input_labels is not None
+        #     show_points(point_coords, input_labels, plt.gca())
 
         if box_coords is not None:
             show_box(box_coords, plt.gca())

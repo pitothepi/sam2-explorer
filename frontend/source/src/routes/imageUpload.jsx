@@ -50,14 +50,14 @@ export default function ImageUpload() {
         ctx.fillStyle = 'green';
         for (const point of positivePoints) {
             ctx.beginPath();
-            ctx.arc(point[0], point[1], 10, 0, 2 * Math.PI);
+            ctx.arc(point[0], point[1], 5, 0, 2 * Math.PI);
             ctx.fill();
         }
 
         ctx.fillStyle = 'red';
         for (const point of negativePoints) {
             ctx.beginPath();
-            ctx.arc(point[0], point[1], 10, 0, 2 * Math.PI);
+            ctx.arc(point[0], point[1], 5, 0, 2 * Math.PI);
             ctx.fill();
         }
     }, [positivePoints, negativePoints]);
