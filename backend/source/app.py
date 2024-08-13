@@ -38,7 +38,7 @@ def process_image():
     negative_points = json.loads(request.form['negative-points'])
 
     # segment the image
-    segmented_images = sam_helpers.segment_single_image(image, positive_points, negative_points, image_format = image_format)
+    segmented_images = sam_helpers.segment_single_image(image, positive_points, negative_points, imageFormat = image_format)
 
     # Save the segmented image to a bytes buffer
     img_io = io.BytesIO()
