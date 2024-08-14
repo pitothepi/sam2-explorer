@@ -111,15 +111,27 @@ def draw_masks_video(frameSegments, frameName, videoDirectory, imageFormat):
     randomColor = len(frameSegments.items()) > 1
 
     def draw_individual_object_mask(mask, obj_id=None): # TODO: this should be merged with show_mask above
+        color = None
+        
+        # different color for each object
         if randomColor:
             color = np.concatenate([np.random.random(3), np.array([0.6])], axis=0)
         else:
             cmap = plt.get_cmap("tab10")
             cmap_idx = 0 if obj_id is None else obj_id
             color = np.array([*cmap(cmap_idx)[:3], 0.6])
+
+        # draw the mask
         h, w = mask.shape[-2:]
-        mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
+        rectMask = mask.reshape(h, w, 1)
+        mask_image = rectMask * color.reshape(1, 1, -1)
         ax.imshow(mask_image)
+
+        # draw "keypoint" in the middle of the region
+        maskCoords = np.argwhere(mask.reshape(h, w, 1))
+        if (maskCoords.shape[0] > 0):
+            maskCenter = np.average(maskCoords, axis=0) # this is [y,x]
+            ax.scatter(maskCenter[1], maskCenter[0], color=color, marker='*', s=w/2, edgecolor='black', linewidth=1.25)
 
     # draw the masks for all objects found in video
     for out_obj_id, out_mask in frameSegments.items():

@@ -52,13 +52,16 @@ def process_image():
 
 @app.route('/segment-frames', methods=['POST'])
 def process_frames():
-    print("got many frames!", flush=True)
+    print("got many frames! loading request", flush=True)
 
+    form = request.form
+    print("validating request", flush=True)
     for field in ['frames', 'positive-points', 'negative-points']:
-        if field not in request.form:
+        if field not in form:
             return f"field {field} not in request", 400
 
-    frames = json.loads(request.form['frames'])
+    print("loading frames", flush=True)
+    frames = json.loads(form['frames'])
 
     print(len(frames[0]), flush=True)
     
@@ -71,8 +74,8 @@ def process_frames():
     print(f"image format: {image_format}", flush=True)
 
     # get the points
-    positive_points = json.loads(request.form['positive-points'])
-    negative_points = json.loads(request.form['negative-points'])
+    positive_points = json.loads(form['positive-points'])
+    negative_points = json.loads(form['negative-points'])
 
 
     segmented_frames = []
@@ -80,23 +83,29 @@ def process_frames():
     with tempfile.TemporaryDirectory() as tmpdirname:
         for idx, frame in enumerate(frames):
             # Decode the base64 string
+            print(f"decoding frame {idx}", flush=True)
             image_bytes = base64.b64decode(frame.split(',')[1])
             
             # Use PIL to open the image from the bytes data
+            print(f"saving frame {idx} to temporary directory {tmpdirname}", flush=True)
             Image.open(io.BytesIO(image_bytes)).save( pathlib.Path(tmpdirname) / f"{idx}.{image_format}" )
 
         # segment the images
+        print("segmenting frames...", flush=True)
         segmented_frames = sam_helpers.segment_frame_directory(tmpdirname, positive_points, negative_points)
+        print("done.", flush=True)
 
     data_urls = []
-    for segmented_frame in segmented_frames:
+    for idx, segmented_frame in enumerate(segmented_frames):
         # Save the segmented image to a bytes buffer
         img_io = io.BytesIO()
+        print(f"saving segmented frame {idx} into memory", flush=True)
         segmented_frame.save(img_io, image_format)
         img_io.seek(0)
+        print(f"encoding frame {idx}", flush=True)
         data_urls.append(f"{image_header},{base64.b64encode(img_io.getvalue()).decode('utf-8')}")
 
-    
+    print("sending result!\n", flush=True)
     return jsonify({'frames': data_urls})
 
 if __name__ == '__main__':
