@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import Switch from "react-switch";
 import axios from "axios";
+import PointSelector from "../components/pointSelector.jsx"
 import "./imageUpload.css"
 
 export default function ImageUpload() {
@@ -11,7 +12,6 @@ export default function ImageUpload() {
     const [positivePointMode, setPositivePointMode] = useState(true);
     const [processing, setProcessing] = useState(false);
 
-    const canvasRef = useRef(null);
     const imageRef = useRef(null);
 
     // gets image from user's computer
@@ -26,50 +26,12 @@ export default function ImageUpload() {
         }
     };
 
-    // handles user setting a point on the canvas
-    const handleCanvasClick = (e) => {
-        const canvas = canvasRef.current;
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        // Save the circle coordinates
-        if (positivePointMode) {
-            setPositivePoints(points => [...points, [x, y]]);
-        } else {
-            setNegativePoints(points => [...points, [x, y]]);
-        }
-    };
-
     // clear the result and points
     const handleReset = () => {
         setResultImage(null);
         setPositivePoints([]);
         setNegativePoints([]);
     };
-
-    // redraws canvas whenever points change
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        canvas.width = canvas.getBoundingClientRect().width;
-        canvas.height = canvas.getBoundingClientRect().height;
-
-        const ctx = canvas.getContext('2d');
-
-        ctx.fillStyle = 'green';
-        for (const point of positivePoints) {
-            ctx.beginPath();
-            ctx.arc(point[0], point[1], 2.5, 0, 2 * Math.PI);
-            ctx.fill();
-        }
-
-        ctx.fillStyle = 'red';
-        for (const point of negativePoints) {
-            ctx.beginPath();
-            ctx.arc(point[0], point[1], 2.5, 0, 2 * Math.PI);
-            ctx.fill();
-        }
-    }, [positivePoints, negativePoints]);
 
     // helper function to make the point locations relative to the actual size of the image
     // (since the display size of the image is different from the file size, the points clicked
@@ -121,7 +83,13 @@ export default function ImageUpload() {
                     <div class="flexColumn" style={uploadedImage ? {} : { display: "none" }}>
                         <div className="stacker">
                             <img src={resultImage ? resultImage : uploadedImage} ref={imageRef} alt="Uploaded" />
-                            <canvas ref={canvasRef} onClick={handleCanvasClick}></canvas>
+                            <PointSelector 
+                                positivePoints = {positivePoints}
+                                setPositivePoints = {setPositivePoints}
+                                negativePoints = {negativePoints}
+                                setNegativePoints = {setNegativePoints}
+                                positivePointMode = {positivePointMode}
+                            />
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
                             <div className="flexRow" style={{ alignContent: "baseline" }}>

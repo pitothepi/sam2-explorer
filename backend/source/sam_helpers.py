@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
-from sam2.build_sam import build_sam2
+from sam2.build_sam import build_sam2, build_sam2_video_predictor
 from sam2.sam2_image_predictor import SAM2ImagePredictor
 import io
 import os
@@ -92,19 +92,23 @@ def draw_masks_image(image, masks, scores, imageFormat, point_coords=None, box_c
 
 # adapted from facebook demo
 # draws the masks for all the objects on one frame
-def draw_masks_video(frameSegments, frameName, videoDirectory):
+def draw_masks_video(frameSegments, frameName, videoDirectory, imageFormat):
     frameImage = Image.open(os.path.join(videoDirectory, frameName))
     
     # Get the dimensions of the input image
-    height, width = frameImage.shape[:2]
+    height = frameImage.height
+    width = frameImage.width
     # configurable to make stuff look good
     dpi = 96
 
     # make the figure to draw on
     fig, ax = plt.subplots(figsize=(width/dpi, height/dpi), dpi=dpi)
 
+    # draw base image
+    ax.imshow(frameImage)
+
     # determine if we need multiple colors for multiple masks
-    randomColor = len(videoFrameSegments.items()) > 1
+    randomColor = len(frameSegments.items()) > 1
 
     def draw_individual_object_mask(mask, obj_id=None): # TODO: this should be merged with show_mask above
         if randomColor:
@@ -118,8 +122,8 @@ def draw_masks_video(frameSegments, frameName, videoDirectory):
         ax.imshow(mask_image)
 
     # draw the masks for all objects found in video
-    for out_obj_id, out_mask in videoFrameSegments.items():
-        show_mask(out_mask, plt.gca(), obj_id=out_obj_id)
+    for out_obj_id, out_mask in frameSegments.items():
+        draw_individual_object_mask(out_mask, obj_id=out_obj_id)
 
     plt.axis('off')
     
@@ -168,16 +172,17 @@ def segment_single_image(image, positivePoints, negativePoints, imageFormat, mul
 # return a list of images with segmentation masks drawn on them 
 # format out is list of PIL Image object
 # point arguments should be lists of lists [[x,y],[x.y]]
-def segment_image_directory(framesDirectory, positivePoints, negativePoints, multimask=False):
+def segment_frame_directory(framesDirectory, positivePoints, negativePoints, multimask=False):
     point_coords = np.array(positivePoints + negativePoints)
     point_labels = np.array([1] * len(positivePoints) + [0] * len(negativePoints))
 
     # scan all the JPEG frame names in the video directory
     frame_names = [
         p for p in os.listdir(framesDirectory)
-        if os.path.splitext(p)[-1] in [".jpg", ".jpeg", ".JPG", ".JPEG"]
     ]
     frame_names.sort(key=lambda p: int(os.path.splitext(p)[0]))
+
+    print(frame_names, flush=True)
 
     sam2_checkpoint = "/cachedRepos/segment-anything-2/checkpoints/sam2_hiera_large.pt"
     model_cfg = "sam2_hiera_l.yaml"
@@ -210,6 +215,13 @@ def segment_image_directory(framesDirectory, positivePoints, negativePoints, mul
     # render the segmentation results every frame
     resultFrames = []
     for out_frame_idx in range(0, len(frame_names), 1):
-        resultFrames.append(draw_masks_video(video_segments[out_frame_idx], frame_names[out_frame_idx], framesDirectory))
+        resultFrames.append(
+            draw_masks_video(
+                video_segments[out_frame_idx], 
+                frame_names[out_frame_idx], 
+                framesDirectory, 
+                os.path.splitext(frame_names[0])[-1][1:]
+            )
+        )
 
     return resultFrames

@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
 import LandingPage from './routes/landingPage';
 import ImageUpload from './routes/imageUpload';
+import FramesUpload from './routes/framesUpload';
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
   {
     path: "/imageUpload",
     element: <ImageUpload />,
+  },
+  {
+    path: "/framesUpload",
+    element: <FramesUpload />,
   },
 ]);
 
